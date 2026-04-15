@@ -135,7 +135,7 @@ with st.expander("📂 Batch Processing", expanded=False):
                             "future_land_use": str(p.get('land_use') or "N/A"),
                             "max_height_stories": str(z.get('max_height_stories') or "N/A"),
                             "clean_address": str(m.get('clean_address') or "N/A"),
-                            "input_address": str(m.get('input_address') or q_input), # Принудительно в строку
+                            "input_address": str(m.get('input_address') or val), # Принудительно в строку
                             "latitude": l.get('lat'), # Числа можно оставлять как есть
                             "longitude": l.get('lng'),
                             "jurisdiction": str(z.get('jurisdiction') or "N/A"),                            
