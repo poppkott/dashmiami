@@ -63,19 +63,18 @@ with st.sidebar:
     st.title("🏙️ Geo-Anchor")
     user_api_key = st.text_input("RapidAPI Key", type="password")
     st.markdown("---")
-    st.subheader("📬 Contact & Support")
-    st.markdown("**Ivan Fursov** \n*Analytics Engineer*") # \n для переноса строки
+    st.markdown("### Contact")
+    st.markdown("**Ivan Fursov**")
+    st.caption("Analytics Engineer")
     
-    # Ссылки с иконками (Badge-style)
+    # Лаконичные ссылки
     st.markdown("""
-    <a href="https://t.me/fursovi3" target="_blank"><img src="https://img.shields.io/badge/Telegram-Contact-blue?style=for-the-badge&logo=telegram"></a>
-    <a href="https://www.linkedin.com/in/ivan-fursov-86ba793a8/" target="_blank"><img src="https://img.shields.io/badge/LinkedIn-Profile-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"></a>
+        <div style="line-height: 2;">
+            <a href="https://t.me/fursovi3" style="text-decoration:none;">✈️ Telegram</a><br>
+            <a href="https://www.linkedin.com/in/ivan-fursov-86ba793a8/" style="text-decoration:none;">💼 LinkedIn</a><br>
+            <span style="font-size: 14px;">✉️ fursov.ivan@vk.com</span>
+        </div>
     """, unsafe_allow_html=True)
-    
-    st.markdown(f"""
-    **Email:** `fursov.ivan@vk.com`
-    
-    """)
     st.caption("Data updated in March 2026")
 
 # st.title("Miami Property Intelligence")
