@@ -121,26 +121,26 @@ with st.expander("📂 Batch Processing", expanded=False):
                     row_res = {"input_query": val, "status": data.get('status')}
                     
                     if data.get('status') == 'success':
-                        p = data.get('parcel', {})
-                        z = p.get('zoning', {}) or {}
-                        m = data.get('match_metadata', {})
-                        l = data.get('location', {})
+                        p = data.get('parcel') or {}
+                        z = p.get('zoning') or {}
+                        m = data.get('match_metadata') or {}
+                        l = data.get('location') or {}
                         
                         row_res.update({
-                            "folio_id": [p.get('id')],
-                            "anchor_id": [data.get('anchor_id')],
-                            "zoning_code": [z.get('code')],
-                            "zoning_category": [z.get('category')],
-                            "zoning_description": [z.get('description')],
-                            "future_land_use": [p.get('land_use')],
-                            "max_height_stories": [z.get('max_height_stories')],
-                            "jurisdiction": [z.get('jurisdiction')],
-                            "clean_address": [m.get('clean_address')],
-                            "input_address": [m.get('input_address')],
-                            "latitude": [l.get('lat')],
-                            "longitude": [l.get('lng')],
-                            "confidence": [m.get('confidence')],
-                            "source": [m.get('source')]
+                            "folio_id": p.get('id') or "N/A",
+                            "anchor_id": data.get('anchor_id') or "N/A",
+                            "zoning_code": z.get('code') or "N/A",
+                            "zoning_category": z.get('category') or "N/A",
+                            "zoning_description": z.get('description') or "N/A",
+                            "future_land_use": p.get('land_use') or "N/A",
+                            "max_height_stories": z.get('max_height_stories') or "N/A",
+                            "jurisdiction": z.get('jurisdiction') or "N/A",
+                            "clean_address": m.get('clean_address') or "N/A",
+                            "input_address": m.get('input_address') or val,
+                            "latitude": l.get('lat'),
+                            "longitude": l.get('lng'),
+                            "confidence": m.get('confidence') or "N/A",
+                            "source": m.get('source') or "N/A"
                         })
                         
                         map_points.append({
@@ -257,38 +257,30 @@ if st.session_state.analysis_result:
     data = st.session_state.analysis_result
     
     if data.get('status') == 'success':
-        p = data.get('parcel', {})
-        z = p.get('zoning', {})
-        l = data.get('location', {})
-        m = data.get('match_metadata', {})
+        p = data.get('parcel') or {}
+        z = p.get('zoning') or {}
+        l = data.get('location') or {}
+        m = data.get('match_metadata') or {}
 
         # МГНОВЕННЫЙ ВЫВОД ТЕКСТА
         st.subheader(f"📍 {m.get('clean_address')}")
         
         m1, m2, m3 = st.columns(3)
-        folio_val = p.get('id') if p else "N/A"
-        # Проверяем, существует ли z, прежде чем делать .get()
-        zoning_val = z.get('code') if z else "N/A"
-        # Для Anchor ID берем из общего корня data
-        anchor_val = data.get('anchor_id', 'N/A') if data.get('anchor_id') else "N/A"
-
-        m1.metric("Folio ID", folio_val)
-        m2.metric("Zoning Code", zoning_val)
-        m3.metric("Anchor ID", anchor_val)
+        m1.metric("Folio ID", p.get('id') or "N/A")
+        m2.metric("Zoning Code", z.get('code') or "N/A")
+        m3.metric("Anchor ID", (data.get('anchor_id') or "N/A")[:12])
 
         # 3. TECHNICAL DETAILS
         st.markdown("### Property Details")
-        
-        # Разметка через f-строку для чистоты
         st.markdown(f"""
         <div class="report-text" style="background-color: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 5px solid #1E3A8A;">
-            <b>Input Address:</b> {m.get('input_address')}<br>
-            <b>Clean Address:</b> {m.get('clean_address')}<br>
+            <b>Input Query:</b> {m.get('input_address') or 'N/A'}<br>
+            <b>Clean Address:</b> {m.get('clean_address') or 'N/A'}<br>
             <b>Source:</b> {m.get('source') or 'Official data'}<br>
             <hr style="margin: 10px 0; border: 0.1px solid #ddd;">
-            <b>Latitude:</b> <code>{l.get('lat')}</code><br>
-            <b>Longitude:</b> <code>{l.get('lng')}</code><br>
-            <b>Jurisdiction:</b> {z.get('jurisdiction') or 'City of Miami'}<br>
+            <b>Latitude:</b> <code>{l.get('lat') or 'N/A'}</code><br>
+            <b>Longitude:</b> <code>{l.get('lng') or 'N/A'}</code><br>
+            <b>Jurisdiction:</b> {z.get('jurisdiction') or 'N/A'}<br>
             <hr style="margin: 10px 0; border: 0.1px solid #ddd;">
             <b>Zoning Category:</b> {z.get('category') or 'N/A'}<br>
             <b>Zoning Description:</b> {z.get('description') or 'N/A'}<br>
@@ -296,7 +288,7 @@ if st.session_state.analysis_result:
             <b>Floor Lot Ratio (FLR):</b> {z.get('floor_lot_ratio') or 'N/A'}<br>
             <b>Future Land Use:</b> {p.get('land_use') or 'N/A'}<br>
             <hr style="margin: 10px 0; border: 0.1px solid #ddd;">
-            <b>Match Confidence:</b> <span style="color: {'green' if m.get('confidence') == 'HIGH' else '#e67e22'}">{m.get('confidence')}</span>
+            <b>Match Confidence:</b> <span style="color: {'green' if m.get('confidence') == 'HIGH' else '#e67e22'}">{m.get('confidence') or 'UNKNOWN'}</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -305,20 +297,20 @@ if st.session_state.analysis_result:
         # 3. EXPORT TO CSV (Tabular Format)
         # Создаем DataFrame в одну строку — идеально для Excel
         row_data = {
-            "folio_id": [p.get('id')],
-            "anchor_id": [data.get('anchor_id')],
-            "zoning_code": [z.get('code')],
-            "zoning_category": [z.get('category')],
-            "zoning_description": [z.get('description')],
-            "future_land_use": [p.get('land_use')],
-            "max_height_stories": [z.get('max_height_stories')],
-            "jurisdiction": [z.get('jurisdiction')],
-            "clean_address": [m.get('clean_address')],
-            "input_address": [m.get('input_address')],
-            "latitude": [l.get('lat')],
-            "longitude": [l.get('lng')],
-            "confidence": [m.get('confidence')],
-            "source": [m.get('source')]
+            "folio_id": p.get('id') or "N/A",
+            "anchor_id": data.get('anchor_id') or "N/A",
+            "zoning_code": z.get('code') or "N/A",
+            "zoning_category": z.get('category') or "N/A",
+            "zoning_description": z.get('description') or "N/A",
+            "future_land_use": p.get('land_use') or "N/A",
+            "max_height_stories": z.get('max_height_stories') or "N/A",
+            "jurisdiction": z.get('jurisdiction') or "N/A",
+            "clean_address": m.get('clean_address') or "N/A",
+            "input_address": m.get('input_address') or val,
+            "latitude": l.get('lat'),
+            "longitude": l.get('lng'),
+            "confidence": m.get('confidence') or "N/A",
+            "source": m.get('source') or "N/A"
         }
         df_export = pd.DataFrame(row_data)
         
