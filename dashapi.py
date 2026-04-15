@@ -83,7 +83,7 @@ with st.sidebar:
 # BATCH PROCESSING
 # ==========================================
 with st.expander("📂 Batch Processing", expanded=False):
-    st.markdown("Upload a XLSX file. Ensure it has a column named **'address'** or **'location'**.")
+    st.markdown("Upload a Excel file. Ensure it has a column named **'address'** or **'location'**.")
     
     # 1. Загрузка файла
     uploaded_file = st.file_uploader("Choose a file", type=['csv', 'xlsx'])
@@ -199,7 +199,7 @@ with st.expander("📂 Batch Processing", expanded=False):
 # ==========================================
 # SINGLE ANALYSIS
 # ==========================================
-q_input = st.text_input("Search (Address or 25.77, -80.19)")
+q_input = st.text_input("Enter Address (e.g. 123 SW 8th St) or Coordinates (e.g. 25.77, -80.19)")
 
 # 1. Инициализируем хранилище данных в сессии
 if 'analysis_result' not in st.session_state:
@@ -266,9 +266,15 @@ if st.session_state.analysis_result:
         st.subheader(f"📍 {m.get('clean_address')}")
         
         m1, m2, m3 = st.columns(3)
-        m1.metric("Folio ID", p.get('id') or "N/A")
-        m2.metric("Zoning Code", z.get('code') or "N/A")
-        m3.metric("Anchor ID", data.get('anchor_id', 'N/A')) # Короткий ID для красоты
+        folio_val = p.get('id') if p else "N/A"
+        # Проверяем, существует ли z, прежде чем делать .get()
+        zoning_val = z.get('code') if z else "N/A"
+        # Для Anchor ID берем из общего корня data
+        anchor_val = data.get('anchor_id', 'N/A') if data.get('anchor_id') else "N/A"
+
+        m1.metric("Folio ID", folio_val)
+        m2.metric("Zoning Code", zoning_val)
+        m3.metric("Anchor ID", anchor_val)
 
         # 3. TECHNICAL DETAILS
         st.markdown("### Property Details")
