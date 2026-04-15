@@ -127,20 +127,20 @@ with st.expander("📂 Batch Processing", expanded=False):
                         l = data.get('location') or {}
                         
                         row_res.update({
-                            "folio_id": p.get('id') or "N/A",
-                            "anchor_id": data.get('anchor_id') or "N/A",
-                            "zoning_code": z.get('code') or "N/A",
-                            "zoning_category": z.get('category') or "N/A",
-                            "zoning_description": z.get('description') or "N/A",
-                            "future_land_use": p.get('land_use') or "N/A",
-                            "max_height_stories": z.get('max_height_stories') or "N/A",
-                            "jurisdiction": z.get('jurisdiction') or "N/A",
-                            "clean_address": m.get('clean_address') or "N/A",
-                            "input_address": m.get('input_address') or val,
-                            "latitude": l.get('lat'),
+                            "folio_id": str(p.get('id') or "N/A"),
+                            "anchor_id": str(data.get('anchor_id') or "N/A"),
+                            "zoning_code": str(z.get('code') or "N/A"),
+                            "zoning_category": str(z.get('category') or "N/A"),
+                            "zoning_description": str(z.get('description') or "N/A"),
+                            "future_land_use": str(p.get('land_use') or "N/A"),
+                            "max_height_stories": str(z.get('max_height_stories') or "N/A"),
+                            "clean_address": str(m.get('clean_address') or "N/A"),
+                            "input_address": str(m.get('input_address') or q_input), # Принудительно в строку
+                            "latitude": l.get('lat'), # Числа можно оставлять как есть
                             "longitude": l.get('lng'),
-                            "confidence": m.get('confidence') or "N/A",
-                            "source": m.get('source') or "N/A"
+                            "jurisdiction": str(z.get('jurisdiction') or "N/A"),                            
+                            "confidence": str(m.get('confidence') or "N/A"),
+                            "source": str(m.get('source') or "N/A")
                         })
                         
                         map_points.append({
@@ -208,19 +208,27 @@ if 'analysis_result' not in st.session_state:
 # 2. Фрагмент карты (изолированный поток)
 @st.fragment
 def map_section(location, match_meta, parcel_info):
-    z = parcel_info.get('zoning', {})
+    z = parcel_info.get('zoning') if parcel_info else None
     st.write("---")
     with st.container():
         # Показываем статус именно в зоне карты
         # st.info("🛰️ Rendering spatial data...")
         
+        clean_addr = match_meta.get('clean_address') or "Unknown Location"
+        folio_id = parcel_info.get('id') or "N/A"
+        
+        # Безопасное извлечение данных зонирования
+        z_code = z.get('code') if z else "N/A"
+        z_desc = z.get('description') if z else "No data"
+        z_juris = z.get('jurisdiction') if z else "N/A"
+        
         tooltip_html = f"""
             <div style='font-size: 14px; background-color: #262730; color: white; padding: 10px; border-radius: 5px;'>
-                <b style='color:#4dabff; font-size: 16px;'>{match_meta.get('clean_address')}</b><br/>
+                <b style='color:#4dabff; font-size: 16px;'>{clean_addr}</b><br/>
                 <hr style='margin: 5px 0; border: 0.2px solid #555;'/>
-                <b>Folio:</b> {parcel_info.get('id')}<br/>
-                <b>Zoning:</b> {z.get('code')} ({z.get('description')})<br/>
-                <b>Jurisdiction:</b> {z.get('jurisdiction')}
+                <b>Folio:</b> {folio_id}<br/>
+                <b>Zoning:</b> {z_code} ({z_desc})<br/>
+                <b>Jurisdiction:</b> {z_juris}
             </div>
         """
         
@@ -306,16 +314,15 @@ if st.session_state.analysis_result:
             "max_height_stories": z.get('max_height_stories') or "N/A",
             "jurisdiction": z.get('jurisdiction') or "N/A",
             "clean_address": m.get('clean_address') or "N/A",
-            "input_address": m.get('input_address') or val,
+            "input_address": m.get('input_address') or q_input, # Исправлено val на q_input
             "latitude": l.get('lat'),
             "longitude": l.get('lng'),
             "confidence": m.get('confidence') or "N/A",
             "source": m.get('source') or "N/A"
         }
-        df_export = pd.DataFrame(row_data)
         
-        # Конвертируем в CSV
-        # csv = df_export.to_csv(index=False).encode('utf-8')
+        # Исправленная строка:
+        df_export = pd.DataFrame([row_data])
         
         # Создаем буфер в памяти
         buffer = io.BytesIO()
