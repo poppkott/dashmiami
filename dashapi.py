@@ -72,10 +72,11 @@ with st.sidebar:
         <div style="line-height: 2;">
             <a href="https://t.me/fursovi3" style="text-decoration:none;">✈️ Telegram</a><br>
             <a href="https://www.linkedin.com/in/ivan-fursov-86ba793a8/" style="text-decoration:none;">💼 LinkedIn</a><br>
-            <span style="font-size: 14px;">✉️ fursov.ivan@vk.com</span>
+            <span style="font-size: 14px;">✉️ ivanedgery@gmail.com </span>
         </div>
     """, unsafe_allow_html=True)
-    st.caption("Data updated in March 2026")
+    st.caption("Data updated in March 2026.")
+    st.caption("For information purposes only. Always verify with the Miami Zoning Department before making financial decisions.")
 
 # st.title("Miami Property Intelligence")
 
