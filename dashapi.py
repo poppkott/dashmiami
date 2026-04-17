@@ -189,7 +189,7 @@ with st.expander("📂 Batch Processing", expanded=False):
                             "ScatterplotLayer",
                             data=map_points,
                             get_position="[lng, lat]",
-                            get_radius=100,
+                            get_radius=15,
                             get_color="[220, 30, 0, 160]",
                             pickable=True
                         )],
